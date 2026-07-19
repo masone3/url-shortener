@@ -28,6 +28,8 @@ async function redirectToOriginal(req, res) {
       return res.status(404).json({ error: 'Short URL not found.' });
     }
 
+    console.log(`[${code}] served from: ${record.fromCache ? 'CACHE' : 'DATABASE'}`);
+
     await urlService.incrementClicks(code);
     res.redirect(record.originalUrl);
   } catch (err) {
