@@ -1,6 +1,7 @@
 require('dotenv').config();
 const express = require('express');
 const urlRoutes = require('./routes/urlRoutes');
+const errorHandler = require('./middleware/errorHandler');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -12,6 +13,8 @@ app.get('/health', (req, res) => {
 });
 
 app.use('/', urlRoutes);
+
+app.use(errorHandler);
 
 app.listen(PORT, () => {
   console.log(`Server running on http://localhost:${PORT}`);

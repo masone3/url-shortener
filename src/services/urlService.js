@@ -5,6 +5,17 @@ const redis = require('../config/redis');
 const CODE_LENGTH = 7;
 const CACHE_TTL_SECONDS = 60 * 60 * 24; // 24 hours
 
+const QRCode = require('qrcode');
+
+async function generateQRCode(shortUrl) {
+  const buffer = await QRCode.toBuffer(shortUrl, {
+    type: 'png',
+    width: 300,
+    margin: 2,
+  });
+  return buffer;
+}
+
 async function generateUniqueShortCode() {
   let code;
   let exists = true;
@@ -60,9 +71,27 @@ async function incrementClicks(shortCode) {
   });
 }
 
+async function getStats(shortCode) {
+  const record = await prisma.url.findUnique({ where: { shortCode } });
+
+  if (!record) {
+    return null;
+  }
+
+  return {
+    shortCode: record.shortCode,
+    originalUrl: record.originalUrl,
+    clicks: record.clicks,
+    createdAt: record.createdAt,
+    updatedAt: record.updatedAt,
+  };
+}
+
 module.exports = {
   generateUniqueShortCode,
   createShortUrl,
   getUrlByShortCode,
   incrementClicks,
+  generateQRCode,
+  getStats,
 };
